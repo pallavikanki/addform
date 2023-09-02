@@ -42,7 +42,7 @@ const Home = () => {
           )
         })
       }
-      <h1>Hello</h1>
+      <label>Program</label>
       <div className='my-2'>
         <label>Calculate Addition Value:{sum}
         </label> <br/>
