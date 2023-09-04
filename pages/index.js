@@ -1,9 +1,24 @@
-import { useState } from "react";
-import Structure from './Structure'
+import { useEffect, useState } from "react";
+//import Structure from './Structure'
 const Home = () => {
  const [sum, setSum] = useState(0);
  const [multi, setMulti] = useState(0);
-  const [template, setTemplate] = useState(Structure)
+  const [template, setTemplate] = useState([])
+  const [formulaName,setFormulaName] = useState('')
+  const [formula,setFormula] = useState('')
+  useEffect(()=>{
+    const fetchFormula=async()=>{
+       let formulaTemplate =JSON.parse(localStorage.getItem("formulaTemplate"));
+            
+       let formulaName =localStorage.getItem("formula Name");
+       let formula =localStorage.getItem("formula");
+       setTemplate (formulaTemplate)
+       setFormulaName(formulaName)
+       setFormula(formula)
+    }
+
+    fetchFormula();
+  },[])
   const textChangeEvent = (e, item) => {
     template[item.id].value = parseFloat(e.target.value) ? parseFloat(e.target.value) : 0;
     setTemplate(template)
@@ -26,27 +41,28 @@ const Home = () => {
   return (
     <div className='m-40'>
       <div className='my-2'>
-        <label>Formula:</label> <input className='p-1 mx-2 ring-offset-2 ring-2'
-          valuer='eg: Enter a formula' />
+        <p> <label>Name: {formulaName}</label></p>
+         <p> <label>Formula: {formula}</label></p>
+      
       </div>
-      {
-        Structure.map((item) => {
+      {template.length>0 &&  (
+        template.map((item) => {
           return (
             <div key={item.key} className='p-2'>
               <label className='my-2' key={item.key}>{item.label}</label> <input className='p-1 mx-2 ring-offset-2 ring-2'
-                placeholder='eg: Enter a formula' onChange={(e) => {
+                placeholder={"Enter "+item.label} onChange={(e) => {
                   textChangeEvent(e, item)
                 }} />
+                <label>{item.unit}</label>
 
             </div>
           )
-        })
+        }) )
       }
-      <label>Program</label>
       <div className='my-2'>
-        <label>Calculate Addition Value:{sum}
-        </label> <br/>
-        <label>Calculate multiplication Value:{multi}
+        {/* <label>Calculate Addition Value:{sum}
+        </label> <br/> */}
+        <label>Calculation :{multi}
         </label> 
       </div>
     </div>

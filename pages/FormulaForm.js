@@ -73,6 +73,10 @@ function FormulaForm() {
   
     if (isTemplateValid && formulaName.trim() && formula.trim()) {
       console.log("Form is valid");
+      localStorage.setItem("formulaTemplate", JSON.stringify(template));
+      localStorage.setItem("formula", formula);
+      localStorage.setItem("formula Name", formulaName);
+
     }
   }
   const renderError = (field, index) => {

@@ -1,25 +1,17 @@
 const Structure = [
   {
     "id": 0,
-    "key": 'a',
-    "label": "height",
+    "key": 'L',
+    "label": "Length",
     "limit": 2,
     "value": ""
   },
   {
     "id": 1,
-      "key": 'b',
-      "label": "width",
+      "key": 'w',
+      "label": "Width",
       "limit": 2,
       "value": ""
     },
-    {
-      "id": 2,
-      "key": 'c',
-      "label": "depth",
-      "limit": 2,
-      "value": ""
-    }
-
 ]
 export default Structure;
