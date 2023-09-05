@@ -12,10 +12,16 @@
     "autoprefixer": "10.4.15",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
+    "exceljs": "^4.3.0",
+    "file-saver": "^2.0.5",
+    "jspdf": "^2.5.1",
     "next": "13.4.19",
+    "peer": "^1.0.1",
     "postcss": "8.4.29",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tailwindcss": "3.3.3"
+    "sheetjs-style": "^0.15.8",
+    "tailwindcss": "3.3.3",
+    "xlsx": "^0.18.5"
   }
 }
