@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import * as XLSX from 'xlsx';
 import {useRouter} from 'next/router';
-
+import { BASE_URL } from './api/config';
 function Home() {
   const [formulaName, setFormulaName] = useState('');
-  const [formula, setFormula] = useState('');
   const [template, setTemplate] = useState([]);
   const [errors, setErrors] = useState({ template: [] });
   const [exportError, setExportError] = useState(null);
@@ -19,7 +18,6 @@ function Home() {
         label: '',
         limit: '',
         unit: '',
-        defaultValue: '',
         type: ''
       }
       tmpArr.push(tmpObj)
@@ -60,10 +58,6 @@ function Home() {
         itemErrors.unit = 'Unit is required';
         valid = false;
       }
-      if (!item.defaultValue.trim()) {
-        itemErrors.defaultValue = 'DefaultValue is required';
-        valid = false;
-      }
       if (!item.type) {
         itemErrors.type = 'Type is required';
         valid = false;
@@ -76,48 +70,116 @@ function Home() {
     return valid;
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const isTemplateValid = validateTemplate();
 
-    if (isTemplateValid && formulaName.trim() && formula.trim()) {
-      console.log("Form is valid");
-      localStorage.setItem("formulaTemplate", JSON.stringify(template));
-      localStorage.setItem("formula", formula);
-      localStorage.setItem("formula Name", formulaName);
-      router.push('/FormulaForm');
+    if (isTemplateValid && formulaName.trim()) {
+      let Measurement = JSON.stringify(template)
+       let mdata = {
+      measurement: Measurement,
+      name:formulaName
+
+       }
+
+
+      try {
+        const response = await fetch(BASE_URL+'posttype', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: mdata }), // Replace with your actual data
+        });
+        const data = await response.json();
+        if (response.isSuccess) {
+          
+          setMessage(data.message);
+          console.log('data'+data);
+        } else {
+          // Handle errors here
+          console.log(response)
+          console.error('Failed to store data');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    
+
+      // console.log("Form is valid");
+      // localStorage.setItem("formulaTemplate", JSON.stringify(template));
+      // localStorage.setItem("formula Name", formulaName);
+      // router.push('/FormulaForm');
     }
   }
-
   const options = [
-    { value: "date", label: "Date" },
     { value: "string", label: "String" },
     { value: "number", label: "Number" },
     { value: "isFormula", label: "IsFormula" }
   ];
-
+  const tmp = [
+    { key: '', label: 'Eirl' },
+    { key: '', label: 'Item No'},
+    { key: '', label: 'Subitem No'},
+    { key: '', label: 'For Payment'},
+    { key: '', label: 'Date of Measurement'},
+    { key: '', label: 'Particulars of Work'},
+    { key: '', label: 'No.'}
+  ];
+  let template1 = [...tmp ,...template]
   const exportToExcel = () => {
-      const wb = XLSX.utils.book_new();
-      const wsData = [...template.map((item) => ({
-        Key: item.key,
-        Label: item.label,
-        Limit: item.limit,
-        Unit: item.unit,
-        DefaultValue: item.defaultValue,
-        Type: item.type
-      }))];
-      const ws = XLSX.utils.json_to_sheet(wsData);
-      XLSX.utils.book_append_sheet(wb, ws, 'Template Data');
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'template.xlsx';
-      a.click();
-      URL.revokeObjectURL(url);
-      setExportError(null);
+    const wb = XLSX.utils.book_new();
+    const wsData = [    
+      template1.map(item => item.label),   
+      template1.map(item => item.key),  
+      template1.map(item=>item.unit),
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
   
+    XLSX.utils.book_append_sheet(wb, ws, 'Data');
+    const excelBuffer = XLSX.write(wb, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+    const blob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.xlsx';
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportError(null);
   };
+  
+  
+  
+  
+
+//   const exportToExcel = () => {
+//     const wb = XLSX.utils.book_new();
+//     const wsData = [...template.map((item) => ({
+//       Key: item.key,
+//       Label: item.label,
+//       Limit: item.limit,
+//       Unit: item.unit,
+//       Type: item.type
+//     }))];
+//     const ws = XLSX.utils.json_to_sheet(wsData);
+//     XLSX.utils.book_append_sheet(wb, ws, 'Data');
+//     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+//     const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+//     const url = URL.createObjectURL(blob);
+//     const a = document.createElement('a');
+//     a.href = url;
+//     a.download = 'data.xlsx';
+//     a.click();
+//     URL.revokeObjectURL(url);
+//     setExportError(null);
+
+// };
+  
 
   return (
     <div className="m-5">
@@ -129,15 +191,6 @@ function Home() {
             placeholder='e.g., Enter Formula name'
             value={formulaName}
             onChange={(e) => setFormulaName(e.target.value)}
-          />
-        </div>
-        <div className='my-2'>
-          <label>Formula:</label>
-          <input
-            className='p-1 mx-20 ring-offset-2 ring-2'
-            placeholder='e.g., Enter a formula'
-            value={formula}
-            onChange={(e) => setFormula(e.target.value)}
           />
         </div>
         <div className='my-2'>
@@ -158,7 +211,6 @@ function Home() {
                   <label>Label</label>
                   <label>Limit</label>
                   <label>Unit</label>
-                  <label>DefaultValue</label>
                   <label>Type</label>
                   <br />
                 </div>
@@ -190,13 +242,6 @@ function Home() {
                   : ""
                   }`}
                 onChange={(e) => updateValue(e, "unit", item.id)}
-              />
-              <input
-                className={`p-1 m-2 ring-offset-2 ring-2 ${errors.template[index] && errors.template[index].defaultValue
-                  ? "ring-red-500"
-                  : ""
-                  }`}
-                onChange={(e) => updateValue(e, "defaultValue", item.id)}
               />
               <select
                 className={`p-1 m-2 ring-offset-2 ring-2 ${errors.template[index] && errors.template[index].type

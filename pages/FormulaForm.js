@@ -49,7 +49,7 @@ const FormulaForm = () => {
           console.log(item.key)
           console.log(formula.includes(item.key))
           if (formula.includes(item.key)) {
-            m = m.replace(item.key, item.value)
+             m=m.replace(new RegExp(item.key, 'g'), item.value);
             console.log("ghkg" + m)
             localStorage.setItem("formul", m);
             

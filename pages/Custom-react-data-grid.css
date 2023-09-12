@@ -1,0 +1,21 @@
+/* Override the background color of the header row */
+.rdg-header-row {
+    background-color: #f0f0f0;
+  }
+  
+  /* Override the text color of the header cells */
+  .rdg-header-cell {
+    color: #333;
+  }
+  
+  /* Override the background color of the selected row */
+  .rdg-selected {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  /* Customize the font size of the cell content */
+  .rdg-cell {
+    font-size: 14px;
+  }
+  
