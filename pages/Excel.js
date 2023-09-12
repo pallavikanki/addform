@@ -139,8 +139,55 @@ const Excel = () => {
   
   };
 
+    const dropdownOptions = ['Option 1', 'Option 2',];
+
+    const [selectedOption, setSelectedOption] = useState('');
+  
+    const handleDropdownChange = (e) => {
+      setSelectedOption(e.target.value);
+      const setSelectedOption = async () => {
+        try {
+          const response = await fetch(BASE_URL+'gettype', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data: excelData }), 
+          });
+          const data = await response.json();
+          if (response.isSuccess) {
+            
+            setMessage(data.message);
+            console.log('data'+data);
+          } else {
+            
+            console.log(response)
+            console.error('Failed to store data');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      
+      };
+    };
+
   return (
     <div className='justify-center item-center flex flex-col m-10'>
+      <div>
+        <select
+          value={selectedOption}
+          onChange={handleDropdownChange}
+          className='p-1 mx-8 ring-offset-2 ring-2'
+        >
+          <option value=''>Select an option</option>
+          {dropdownOptions.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+      <br/>
         <div>
             <input type='file'
             className='p-1 mx-8 ring-offset-2 ring-2'
