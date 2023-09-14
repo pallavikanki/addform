@@ -5,23 +5,16 @@ import 'react-data-grid/lib/styles.css';
 import moment from"moment";
 
 
-const PAGE_SIZE = 10; // Number of rows to load per page
 
-const AllFeatures = ({wdate,type,itemno}) => {
+
+
+const AllFeatures = ({wdate,type,itemno,typeDate}) => {
     
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const columns = [
-    { key: 'date', name: 'Date', width: 200 },
-    { key: 'partiwork', name: 'Particulars of work', width: 200 },
-    { key: 'no', name: 'No.', width: 100 },
-    { key: 'Length', name: 'Length', width: 150 },
-    { key: 'Breadth', name: 'Breadth', width: 150 },
-    { key: 'Depth', name: 'Depth', width: 150 },
-    { key: 'Quantity', name: 'Quantity', width: 150 },
-    { key: 'unit', name: 'Unit', width: 50 },
-  ];
+  const [tableColums,SetTableColums] = useState([])
 
 
   function isAtBottom({ currentTarget }){
@@ -35,7 +28,28 @@ const AllFeatures = ({wdate,type,itemno}) => {
   }
 
   useEffect(()=>{
+    let columns = [
+      { key: 'date', name: 'Date', width: 200 },
+      { key: 'partiwork', name: 'Particulars of work', width: 200 },
+      { key: 'no', name: 'No.', width: 100 },
+    
+      
+    ];
+   let typeDetail= typeDate.filter(item=>item.tid==type);
+   if(typeDetail.length>0){
+    let  measurement =JSON.parse(typeDetail[0].measurement);
+    for (let i=0 ; i<measurement.length;i++){
+       let msObj = {key:measurement[i].label,name:measurement[i].label,width:150 }
+       columns.push(msObj)
+    
+    }
+    columns.push({ key: 'Quantity', name: 'Quantity', width: 150 })
+   
+    SetTableColums(columns)
+   
+    
     fetchData();
+  }
   },[])
 
   const fetchData = async () => {
@@ -43,7 +57,7 @@ const AllFeatures = ({wdate,type,itemno}) => {
     let  formattedDate = moment(wdate, 'DD-MM-YYYY').format('YYYY/MM/DD')
     // Simulate an API call to fetch data
     try {
-      const response = await fetch(`http://192.168.1.10:3002/getdateWiseData?wdate=${formattedDate}&itemno=${itemno}&type=${type}&page=${page}`);
+      const response = await fetch(`http://192.168.1.2:3002/getdateWiseData?wdate=${formattedDate}&itemno=${itemno}&type=${type}&page=${page}`);
       const data = await response.json();
       
       // Append the newly loaded data to the existing rows
@@ -62,10 +76,12 @@ const AllFeatures = ({wdate,type,itemno}) => {
   return (
     <div style={{padding:10}}>
     <p>Item Id: {rows.length>0?rows[0].itemno:0} </p>
+    
       <DataGrid
-        columns={columns}
+        columns={tableColums}
         rows={rows}
         onScroll={handleScroll}
+        style={{ height :rows.length<10?(rows.length*35)+50+'px':'400px' }}
         loading={loading} // Display a loading indicator
       />
       {/* {loading && <div style={{position:'absolute',width:'100%',height:50,backgroundColor:'rgb(0 0 0 / 0.6)',textAlign:'center'}}>

@@ -3,17 +3,40 @@ import DataGrid from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import AllFeatures from './AllFeatures';
 //import './Custom-react-data-grid.css'
+import { BASE_URL } from './api/config';
 
 
 
 const mb = () => {
   const [dateList, setDateList] = useState([]);
+  const [typeDate, setTypeData] = useState([])
+  const fetchData = async () => {
+    try {
+      const response = await fetch(BASE_URL + 'gettype', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+       
+      });
 
-  
+      if (response.ok) {
+        
+        const datap = await response.json();
+    
+        setTypeData(datap); // Assuming your API response has an 'options' property
+    
+      } else {
+        console.error('Failed to fetch data');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
   const getCardData = async () => {
     try {
       const res = await fetch(
-        `http://192.168.1.10:3002/getAllDate`
+        `http://192.168.1.2:3002/getAllDate`
       );
 
       if (!res.ok) {
@@ -32,8 +55,17 @@ const mb = () => {
       console.error(err);
     }
   };
+  // useEffect(() => {
+  //   // Fetch data from the API when the component mounts
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
+    fetchData();
+   
+  }, []);
+  useEffect(() => {
+  
     getCardData();
   }, []);
 
@@ -43,8 +75,8 @@ const mb = () => {
   };
   return (
     <div >
-    {dateList.map((item)=> <AllFeatures {...item}></AllFeatures> ) }
-    
+    {dateList.map((item)=> <AllFeatures {...item} typeDate={typeDate}></AllFeatures> ) }
+     
     
     </div>
   );

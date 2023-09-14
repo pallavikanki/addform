@@ -4,6 +4,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { BASE_URL } from './api/config';
+import * as XLSX from 'xlsx';
 
 import moment from "moment";
 
@@ -25,13 +26,9 @@ const Excel = () => {
   const [excelData, setExcelData] = useState([]);
   const [excelError, setExcelError] = useState('');
   const [message, setMessage] = useState('');
-  //let demoDate=  moment('15-04-2022').format('YYYY/DD/MM');
 
-  const formattedDate = moment('2022/15/04', 'DD-MM-YYYY').format('YYYY/DD/MM');
-  console.log(formattedDate);
-  //console.log(formattedDate);
-  //console.log(demoDate);
   const file_type = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']
+
   const handleChange = (e) => {
     const selected_file = e.target.files[0];
 
@@ -55,8 +52,18 @@ const Excel = () => {
               let tmp = headerNames[i]
               msObj[tmp] = ''
             }
+
             // console.log(msObj);
             let dummyData = [];
+            let templateData = dropdownOptions.filter(item => item.tid == selectedOption);
+            let measurement = templateData.length > 0 ? JSON.parse(templateData[0].measurement) : null;
+            
+            if (measurement !== null) {
+              measurement.map(item=>item.key)
+            } else {
+              // Handle the case where templateData is empty
+            }
+            console.log(measurement);
             // let tmpObj = {}
             for (let i = 1; i < data.length; i++) {
               let tmp = i - 1
@@ -75,7 +82,7 @@ const Excel = () => {
 
               tmpObj.date = formattedDate;
 
-              tmpObj.type = 1;
+              tmpObj.type = selectedOption;
               tmpObj.partiwork = data[i][headerNames[5]] ? data[i][headerNames[5]] : '';
               var keys = Object.keys(msObj);
               let userMsObj = Object.assign({});
@@ -101,7 +108,6 @@ const Excel = () => {
         setExcelError('please upload only excel file')
         setExcelData([])
       }
-
     }
   }
 
@@ -136,6 +142,8 @@ const Excel = () => {
 
   const [dropdownOptions, setDropdownOptions] = useState(['option 1']);
   const [selectedOption, setSelectedOption] = useState('');
+  const [selectedData, setSelectedData] = useState("");
+  const [data, setData] = useState(false);
 
   useEffect(() => {
     // Fetch data from the API when the component mounts
@@ -154,10 +162,11 @@ const Excel = () => {
       });
 
       if (response.ok) {
+
         const datap = await response.json();
-        // Update the dropdown options based on the fetched data
+        // Update the dropdown options based on the fetched dat
         setDropdownOptions(datap); // Assuming your API response has an 'options' property
-        console.log(datap)
+        //  console.log(datap)
       } else {
         console.error('Failed to fetch data');
       }
@@ -168,22 +177,82 @@ const Excel = () => {
 
   const handleDropdownChange = (e) => {
     const selectedOption = e.target.value;
+
     setSelectedOption(selectedOption);
+    setSelectedData(e.target.value)
+
   };
+  const handletemplate = () => {
+
+    // let templateData = dropdownOptions.filter(item => item.tid == selectedOption);
+    // let measurement = JSON.parse(templateData[0].measurement)
+    // console.log(measurement)
+
+  };
+  let templateData = dropdownOptions.filter(item => item.tid == selectedOption);
+  let measurement = templateData.length > 0 ? JSON.parse(templateData[0].measurement) : null;
+  
+  if (measurement !== null) {
+    measurement.map(item=>item.key)
+  } else {
+    // Handle the case where templateData is empty
+  }
+  console.log(measurement)
+
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const wsData = [
+      measurement.map(item=>item.label),
+      measurement.map(item => item.key),
+
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Data');
+    const excelBuffer = XLSX.write(wb, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+    const blob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.xlsx';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
 
 
   return (
     <div className='justify-center item-center flex flex-col m-10'>
       <div>
         <select value={selectedOption} onChange={handleDropdownChange} className='p-1 mx-8 ring-offset-2 ring-2 h-55 w-500'>
+          <option value={0}>Select </option>
           {dropdownOptions.map((option) => (
-            <option key={option.id} value={option.name}>
+            <option key={option.tid} value={option.tid}>
               {option.name}
+
             </option>
           ))}
         </select>
+        {selectedOption ?
+          <div>
+            <button className='p-1 mx-40 ring-offset-2 ring-2 h-55 w-500'
+              onClick={exportToExcel}>
+              Download Template
+            </button>
+          </div> : <div></div>}
+        <br />
+        {data ?
+          <div className="my-2">
+            <p>{selectedData}</p>
+          </div> : <></>
+        }
       </div>
-      <br />
       <div>
         <input type='file'
           className='p-1 mx-8 ring-offset-2 ring-2'
@@ -191,16 +260,12 @@ const Excel = () => {
         />
       </div>
       <br />
+
       <br />
       <button className='border w-80 shadow-xl ring-offset-2 ring-2' onClick={handlePostData}>Store Data</button>
       <p>{message}</p>
       <br />
       <br />
-      {/* <div className="ag-theme-alpine" style={{ height: 600, width: 1400 }}>
-         <AgGridReact
-           rowData={excelData}
-           columnDefs={columnDefs}/>
-               </div>   */}
     </div>
   )
 }
