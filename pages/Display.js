@@ -35,7 +35,7 @@ const Display = () => {
   const getCardData = async () => {
     try {
       const res = await fetch(
-        `http://192.168.1.19:3002/getdateWiseData?wdate=2022-04-05&itemno=1&type=1&page=1`
+        `http://192.168.1.21:3002/getdateWiseData?wdate=2022-04-05&itemno=1&type=1&page=1`
       );
 
       if (!res.ok) {

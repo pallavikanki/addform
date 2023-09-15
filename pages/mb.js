@@ -25,6 +25,7 @@ const mb = () => {
         const datap = await response.json();
     
         setTypeData(datap); // Assuming your API response has an 'options' property
+        getCardData();
     
       } else {
         console.error('Failed to fetch data');
@@ -36,7 +37,7 @@ const mb = () => {
   const getCardData = async () => {
     try {
       const res = await fetch(
-        `http://192.168.1.2:3002/getAllDate`
+        `http://192.168.1.21:3002/getAllDate`
       );
 
       if (!res.ok) {
@@ -51,6 +52,7 @@ const mb = () => {
       }
 
       setDateList(data);
+   
     } catch (err) {
       console.error(err);
     }
@@ -64,15 +66,16 @@ const mb = () => {
     fetchData();
    
   }, []);
-  useEffect(() => {
+  // useEffect(() => {
   
-    getCardData();
-  }, []);
+  
+  // }, []);
 
   const CustomHeaderRowRenderer = () => {
     // Render an empty header row to hide the header
     return null;
   };
+  console.log(dateList)
   return (
     <div >
     {dateList.map((item)=> <AllFeatures {...item} typeDate={typeDate}></AllFeatures> ) }

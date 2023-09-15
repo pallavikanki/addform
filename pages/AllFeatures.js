@@ -57,7 +57,7 @@ const AllFeatures = ({wdate,type,itemno,typeDate}) => {
     let  formattedDate = moment(wdate, 'DD-MM-YYYY').format('YYYY/MM/DD')
     // Simulate an API call to fetch data
     try {
-      const response = await fetch(`http://192.168.1.2:3002/getdateWiseData?wdate=${formattedDate}&itemno=${itemno}&type=${type}&page=${page}`);
+      const response = await fetch(`http://192.168.1.21:3002/getdateWiseData?wdate=${formattedDate}&itemno=${itemno}&type=${type}&page=${page}`);
       const data = await response.json();
       
       // Append the newly loaded data to the existing rows

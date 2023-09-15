@@ -182,20 +182,13 @@ const Excel = () => {
     setSelectedData(e.target.value)
 
   };
-  const handletemplate = () => {
-
-    // let templateData = dropdownOptions.filter(item => item.tid == selectedOption);
-    // let measurement = JSON.parse(templateData[0].measurement)
-    // console.log(measurement)
-
-  };
   let templateData = dropdownOptions.filter(item => item.tid == selectedOption);
   let measurement = templateData.length > 0 ? JSON.parse(templateData[0].measurement) : null;
   
   if (measurement !== null) {
     measurement.map(item=>item.key)
   } else {
-    // Handle the case where templateData is empty
+    
   }
   console.log(measurement)
 

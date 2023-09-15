@@ -160,7 +160,7 @@ function Home() {
         <div className='my-2'>
           <label>Formula Name:</label>
           <input
-            className='p-1 mx-8 ring-offset-2 ring-2'
+            className='p-1 mx-6 ring-offset-2 ring-2'
             placeholder='e.g., Enter Formula name'
             value={formulaName}
             onChange={(e) => setFormulaName(e.target.value)}
@@ -169,7 +169,7 @@ function Home() {
         <div className='my-2'>
           <label>Quantity</label>
           <input
-            className='p-1 mx-8 ring-offset-2 ring-2'
+            className='p-1 mx-16 ring-offset-2 ring-2'
             placeholder='e.g., Enter Quantity'
             value={quantityName}
             onChange={(e) => setQuantityName(e.target.value)}
@@ -179,7 +179,7 @@ function Home() {
           <label>Number of Rows:</label>
           <input
             type="number"
-            className='p-1 mx-5 ring-offset-2 ring-2'
+            className='p-1 mx-3 ring-offset-2 ring-2'
             placeholder="Enter the number of rows"
             onChange={handleNumRowsChange}
           />
